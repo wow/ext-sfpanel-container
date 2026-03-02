@@ -1,0 +1,173 @@
+{% extends 'layouts/panel.html.twig' %}
+
+{% block title %}{{ stack.name }} - {{ 'stacks.title'|trans }}{% endblock %}
+
+{% block breadcrumbs %}
+    <a href="{{ path('panel_dashboard') }}" class="hover:text-gray-700">{{ 'nav.breadcrumb.panel'|trans }}</a>
+    <svg class="h-4 w-4 text-gray-400 mx-1" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+    <a href="{{ path('panel_containers') }}" class="hover:text-gray-700">{{ 'containers.title'|trans }}</a>
+    <svg class="h-4 w-4 text-gray-400 mx-1" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+    <a href="{{ path('panel_container_stacks') }}" class="hover:text-gray-700">{{ 'stacks.title'|trans }}</a>
+    <svg class="h-4 w-4 text-gray-400 mx-1" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+    <span class="font-medium text-gray-900">{{ stack.name }}</span>
+{% endblock %}
+
+{% block content %}
+    <div class="space-y-6">
+        {# Header #}
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <h1 class="text-2xl font-bold text-gray-900">{{ stack.name }}</h1>
+                <twig:StatusBadge status="{{ stack.statusColor }}">{{ ('stacks.status.' ~ stack.status)|trans }}</twig:StatusBadge>
+            </div>
+            <div class="flex items-center gap-2">
+                {% if not stack.isDeployed %}
+                    <form method="post" action="{{ path('panel_container_stacks_deploy', {name: stack.name}) }}"
+                          data-controller="process-dialog"
+                          data-process-dialog-title-value="{{ 'stacks.terminal.deploying'|trans({'%name%': stack.name}) }}"
+                          data-process-dialog-redirect-url-value="{{ path('panel_container_stacks_show', {name: stack.name}) }}"
+                          data-action="submit->process-dialog#submit">
+                        <input type="hidden" name="_token" value="{{ csrf_token('stack_deploy_' ~ stack.name) }}">
+                        <twig:Button type="submit" variant="success-soft" size="sm">{{ 'stacks.action.deploy'|trans }}</twig:Button>
+                    </form>
+                {% else %}
+                    <form method="post" action="{{ path('panel_container_stacks_down', {name: stack.name}) }}"
+                          data-controller="process-dialog"
+                          data-process-dialog-title-value="{{ 'stacks.terminal.stopping'|trans({'%name%': stack.name}) }}"
+                          data-process-dialog-redirect-url-value="{{ path('panel_container_stacks_show', {name: stack.name}) }}"
+                          data-action="submit->process-dialog#submit">
+                        <input type="hidden" name="_token" value="{{ csrf_token('stack_down_' ~ stack.name) }}">
+                        <twig:Button type="submit" variant="danger-soft" size="sm">{{ 'stacks.action.down'|trans }}</twig:Button>
+                    </form>
+                {% endif %}
+                <twig:Button as="a" href="{{ path('panel_container_stacks_edit', {name: stack.name}) }}" variant="outline" size="sm">
+                    {{ 'stacks.action.edit'|trans }}
+                </twig:Button>
+                <form method="post" action="{{ path('panel_container_stacks_delete', {name: stack.name}) }}"
+                      data-controller="process-dialog"
+                      data-process-dialog-title-value="{{ 'stacks.terminal.deleting'|trans({'%name%': stack.name}) }}"
+                      data-process-dialog-redirect-url-value="{{ path('panel_container_stacks') }}"
+                      data-action="submit->process-dialog#submit">
+                    <input type="hidden" name="_token" value="{{ csrf_token('stack_delete_' ~ stack.name) }}">
+                    <input type="hidden" name="_method" value="DELETE">
+                    <twig:Button type="submit" variant="destructive" size="sm">
+                        {{ 'stacks.action.delete'|trans }}
+                    </twig:Button>
+                </form>
+            </div>
+        </div>
+
+        {# Stack info #}
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <twig:StatCard label="{{ 'stacks.info.services'|trans }}" value="{{ stack.serviceCount }}" />
+            <twig:StatCard label="{{ 'stacks.info.running'|trans }}" value="{{ stack.runningCount }}" />
+            <twig:StatCard label="{{ 'stacks.info.status'|trans }}" value="{{ ('stacks.status.' ~ stack.status)|trans }}" />
+        </div>
+
+        {# Services table #}
+        {% if stack.containers %}
+            <twig:Card class="py-0 gap-0 overflow-hidden">
+                <div class="px-6 py-4 border-b border-border">
+                    <h2 class="text-base font-semibold text-gray-900">{{ 'stacks.services.title'|trans }}</h2>
+                </div>
+                <table class="min-w-full divide-y divide-border">
+                    <thead class="bg-muted/50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">{{ 'stacks.services.th_name'|trans }}</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">{{ 'stacks.services.th_image'|trans }}</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">{{ 'stacks.services.th_status'|trans }}</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">{{ 'stacks.services.th_ports'|trans }}</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-border">
+                        {% for svc in stack.containers %}
+                            <tr>
+                                <td class="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{{ svc.Name ?? svc.Service ?? '-' }}</td>
+                                <td class="px-6 py-3 whitespace-nowrap text-xs font-mono text-gray-600">{{ svc.Image ?? '-' }}</td>
+                                <td class="px-6 py-3 whitespace-nowrap">
+                                    <twig:StatusBadge status="{{ svc.State|default('unknown') == 'running' ? 'green' : 'gray' }}">
+                                        {{ svc.State ?? 'unknown' }}
+                                    </twig:StatusBadge>
+                                </td>
+                                <td class="px-6 py-3 whitespace-nowrap text-xs text-gray-600">{{ svc.Ports ?? '-' }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </twig:Card>
+        {% endif %}
+
+        {# Port Mappings editor #}
+        {% if portsByService is not empty %}
+            <twig:Card data-controller="port-editor"
+                       data-port-editor-ports-value="{{ portsByService|json_encode }}">
+                <div class="px-6">
+                    <h2 class="text-base font-semibold text-gray-900">{{ 'stacks.ports.title'|trans }}</h2>
+                    <p class="mt-1 text-sm text-muted-foreground">{{ 'stacks.ports.subtitle'|trans }}</p>
+                </div>
+
+                <div class="px-6 space-y-6">
+                    {% for serviceName, ports in portsByService %}
+                        <div data-port-editor-target="serviceBlock" data-service="{{ serviceName }}">
+                            <h3 class="text-sm font-medium text-gray-700 mb-2">{{ serviceName }}</h3>
+
+                            {# Complex ports (read-only) #}
+                            {% for port in ports %}
+                                {% if port.complex %}
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="inline-flex items-center rounded-md bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-600/20">
+                                            {{ port.raw }}
+                                        </span>
+                                        <span class="text-xs text-muted-foreground">{{ 'stacks.ports.complex_port'|trans }}</span>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+
+                            {# Editable port rows (rendered by Stimulus) #}
+                            <div data-port-list class="space-y-2"></div>
+
+                            {% if ports|filter(p => not p.complex) is empty and ports|filter(p => p.complex) is empty %}
+                                <p class="text-sm text-muted-foreground italic">{{ 'stacks.ports.no_ports'|trans }}</p>
+                            {% endif %}
+
+                            <button type="button"
+                                    data-action="port-editor#addPort"
+                                    class="mt-2 inline-flex items-center gap-1 text-sm text-cyan-600 hover:text-cyan-700 font-medium">
+                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                                </svg>
+                                {{ 'stacks.ports.add'|trans }}
+                            </button>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="px-6 pb-2">
+                    <form method="post" action="{{ path('panel_container_stacks_ports_save', {name: stack.name}) }}"
+                          data-action="submit->port-editor#save">
+                        <input type="hidden" name="_token" value="{{ csrf_token('stack_ports_' ~ stack.name) }}">
+                        <input type="hidden" name="ports_data" data-port-editor-target="portsData" value="">
+                        <twig:Button type="submit" variant="default" size="sm">
+                            {{ 'stacks.ports.save'|trans }}
+                        </twig:Button>
+                    </form>
+                </div>
+            </twig:Card>
+        {% endif %}
+
+        {# Compose file preview #}
+        {% if composeContent %}
+            <twig:Card>
+                <div class="px-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <h2 class="text-base font-semibold text-gray-900">{{ 'stacks.compose_file'|trans }}</h2>
+                        <twig:Button as="a" href="{{ path('panel_container_stacks_edit', {name: stack.name}) }}" variant="outline" size="xs">
+                            {{ 'stacks.action.edit'|trans }}
+                        </twig:Button>
+                    </div>
+                    <pre class="bg-gray-50 rounded-lg p-4 text-xs font-mono text-gray-700 overflow-auto max-h-[400px] ring-1 ring-gray-900/5">{{ composeContent }}</pre>
+                </div>
+            </twig:Card>
+        {% endif %}
+    </div>
+{% endblock %}

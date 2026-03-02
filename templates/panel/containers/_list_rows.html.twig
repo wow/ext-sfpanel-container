@@ -1,0 +1,72 @@
+{% for container in containers %}
+    <tr class="hover:bg-muted/30 transition-colors">
+        <td class="px-6 py-4 whitespace-nowrap">
+            <div class="flex items-center gap-2">
+                <a href="{{ path('panel_container_show', {id: container.id}) }}" class="text-sm font-medium text-gray-900 hover:text-primary">
+                    {{ container.name }}
+                </a>
+                {% if container.isSfPanel %}
+                    <span class="inline-flex items-center rounded-md bg-purple-50 px-1.5 py-0.5 text-[10px] font-medium text-purple-700 ring-1 ring-inset ring-purple-700/10">
+                        {{ 'containers.badge.system'|trans }}
+                    </span>
+                {% endif %}
+                {% if container.stackName %}
+                    <span class="text-xs text-muted-foreground">{{ container.stackName }}</span>
+                {% endif %}
+            </div>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap">
+            <code class="text-xs text-gray-600">{{ container.image }}</code>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap">
+            <twig:StatusBadge status="{{ container.statusColor }}">
+                {{ container.status }}
+            </twig:StatusBadge>
+        </td>
+        <td class="px-6 py-4 text-xs text-gray-600 max-w-48">
+            <div class="flex flex-wrap gap-1">
+                {% set published = container.ports|filter(p => p.hostPort > 0) %}
+                {% for port in published|slice(0, 3) %}
+                    <span class="inline-block bg-gray-100 rounded px-1.5 py-0.5">{{ port.hostPort }}:{{ port.containerPort }}/{{ port.protocol }}</span>
+                {% endfor %}
+                {% if published|length > 3 %}
+                    <span class="inline-block text-muted-foreground px-1 py-0.5">+{{ published|length - 3 }}</span>
+                {% endif %}
+            </div>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-right">
+            {% if not container.isSfPanel %}
+                <div class="flex items-center justify-end gap-2">
+                    {% if container.state != 'running' %}
+                        <form method="post" action="{{ path('panel_container_action', {id: container.id, action: 'start'}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('container_action_' ~ container.id) }}">
+                            <twig:Button type="submit" variant="success-soft" size="xs">{{ 'containers.action.start'|trans }}</twig:Button>
+                        </form>
+                    {% endif %}
+                    {% if container.state == 'running' %}
+                        <form method="post" action="{{ path('panel_container_action', {id: container.id, action: 'stop'}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('container_action_' ~ container.id) }}">
+                            <twig:Button type="submit" variant="danger-soft" size="xs">{{ 'containers.action.stop'|trans }}</twig:Button>
+                        </form>
+                    {% endif %}
+                    <form method="post" action="{{ path('panel_container_action', {id: container.id, action: 'restart'}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('container_action_' ~ container.id) }}">
+                        <twig:Button type="submit" variant="info-soft" size="xs">{{ 'containers.action.restart'|trans }}</twig:Button>
+                    </form>
+                </div>
+            {% else %}
+                <span class="text-xs text-muted-foreground">{{ 'containers.protected'|trans }}</span>
+            {% endif %}
+        </td>
+    </tr>
+{% else %}
+    <tr>
+        <td colspan="5" class="px-6 py-12 text-center">
+            <twig:EmptyState
+                title="{{ 'containers.empty.title'|trans }}"
+                description="{{ 'containers.empty.description'|trans }}"
+                icon="M21 7.5V18M15 7.5V18M3 16.811V8.69c0-.864.933-1.406 1.683-.977l7.108 4.061a1.125 1.125 0 010 1.954l-7.108 4.061A1.125 1.125 0 013 16.811z"
+            />
+        </td>
+    </tr>
+{% endfor %}

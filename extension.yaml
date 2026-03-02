@@ -1,0 +1,32 @@
+extension:
+    name: sfpanel/containers
+    label: Containers
+    description: Docker container management and Compose stack deployment for sfPanel.
+    version: 1.0.0
+    license: MIT
+    namespace: SfPanel\Ext\Containers
+
+    author:
+        name: sfPanel
+        url: https://github.com/wow
+
+    require:
+        sfpanel: ">=1.0.0"
+        php: ">=8.4"
+
+    permissions:
+        filesystem:
+            read: [/var/run/docker.sock]
+            write: [mnt/containers/]
+        system:
+            commands: [docker]
+        hooks:
+            events_emit:
+                - SfPanel\Ext\Containers\Contracts\Event\ContainerActionEvent
+                - SfPanel\Ext\Containers\Contracts\Event\StackDeployedEvent
+
+    capabilities:
+        routes: true
+        menu_items: true
+        translations: true
+        assets: true

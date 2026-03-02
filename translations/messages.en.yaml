@@ -1,0 +1,129 @@
+# Containers
+containers:
+    title: Containers
+    subtitle: Manage Docker containers running on this server.
+    tab:
+        containers: Containers
+        stacks: Stacks
+        info: Info
+        logs: Logs
+        stats: Stats
+        env: Environment
+        networks: Networks
+    th:
+        name: Name
+        image: Image
+        status: Status
+        ports: Ports
+        actions: Actions
+    badge:
+        system: System
+    protected: Protected
+    action:
+        start: Start
+        stop: Stop
+        restart: Restart
+        remove: Remove
+    remove_confirm: Are you sure you want to remove this container? This action cannot be undone.
+    empty:
+        title: No containers found
+        description: No Docker containers are currently running on this server.
+    detail:
+        id: Container ID
+        image: Image
+        command: Command
+        entrypoint: Entrypoint
+        restart_policy: Restart Policy
+        created: Created
+        started_at: Started At
+        finished_at: Finished At
+        ports: Port Mappings
+        volumes: Volumes
+        labels: Labels
+    logs:
+        title: Container Logs
+        timestamps: Show timestamps
+        loading: Loading logs...
+    stats:
+        cpu: CPU Usage
+        memory: Memory
+        network: Network I/O
+        pids: Processes
+    env:
+        variable: Variable
+        value: Value
+        click_to_reveal: Click to reveal
+        empty: No environment variables found.
+    network:
+        name: Network
+        ip: IP Address
+        gateway: Gateway
+        mac: MAC Address
+        empty: No networks found.
+
+# Stacks
+stacks:
+    title: Compose Stacks
+    subtitle: Manage Docker Compose stacks for multi-container deployments.
+    create_btn: Create Stack
+    services_count: "%running% / %total% services running"
+    status:
+        running: Running
+        partial: Partial
+        stopped: Stopped
+        not_deployed: Not Deployed
+    action:
+        deploy: Deploy
+        down: Stop
+        edit: Edit
+        delete: Delete
+    delete_confirm: Are you sure you want to delete this stack? All containers will be stopped and removed.
+    terminal:
+        deploying: "Deploying %name%..."
+        stopping: "Stopping %name%..."
+        deleting: "Deleting %name%..."
+    empty:
+        title: No stacks yet
+        description: Create a Docker Compose stack to deploy multi-container applications.
+    info:
+        services: Total Services
+        running: Running
+        status: Status
+    services:
+        title: Services
+        th_name: Name
+        th_image: Image
+        th_status: Status
+        th_ports: Ports
+    compose_file: Compose File
+    create:
+        title: Create Stack
+        subtitle: Define a new Docker Compose stack with a compose.yaml file.
+    edit:
+        title: "Edit %name%"
+        subtitle: Modify the compose.yaml file for this stack.
+        breadcrumb: Edit
+    form:
+        name: Stack Name
+        name_placeholder: my-stack
+        name_hint: Lowercase letters, numbers, and hyphens only. Must start with a letter or number.
+        compose_file: Compose File
+        compose_hint: Define your services using Docker Compose syntax.
+        compose_template: |
+            services:
+              web:
+                image: nginx:alpine
+                ports:
+                  - "8080:80"
+        deploy_after: Deploy after creating
+        create_btn: Create Stack
+        save_btn: Save Changes
+        cancel: Cancel
+    ports:
+        title: Port Mappings
+        subtitle: Configure host-to-container port mappings for each service.
+        add: Add Port
+        save: Save Ports
+        save_success: Port mappings saved successfully.
+        no_ports: No port mappings configured.
+        complex_port: Advanced syntax — edit via compose file editor.

@@ -1,0 +1,129 @@
+# Konteynerler
+containers:
+    title: Konteynerler
+    subtitle: Bu sunucuda çalışan Docker konteynerlerini yönetin.
+    tab:
+        containers: Konteynerler
+        stacks: Yığınlar
+        info: Bilgi
+        logs: Günlükler
+        stats: İstatistikler
+        env: Ortam Değişkenleri
+        networks: Ağlar
+    th:
+        name: Ad
+        image: İmaj
+        status: Durum
+        ports: Portlar
+        actions: İşlemler
+    badge:
+        system: Sistem
+    protected: Korumalı
+    action:
+        start: Başlat
+        stop: Durdur
+        restart: Yeniden Başlat
+        remove: Kaldır
+    remove_confirm: Bu konteyneri kaldırmak istediğinizden emin misiniz? Bu işlem geri alınamaz.
+    empty:
+        title: Konteyner bulunamadı
+        description: Bu sunucuda çalışan Docker konteyneri bulunmuyor.
+    detail:
+        id: Konteyner ID
+        image: İmaj
+        command: Komut
+        entrypoint: Giriş Noktası
+        restart_policy: Yeniden Başlatma Politikası
+        created: Oluşturulma
+        started_at: Başlatılma Zamanı
+        finished_at: Bitiş Zamanı
+        ports: Port Eşlemeleri
+        volumes: Birimler
+        labels: Etiketler
+    logs:
+        title: Konteyner Günlükleri
+        timestamps: Zaman damgalarını göster
+        loading: Günlükler yükleniyor...
+    stats:
+        cpu: CPU Kullanımı
+        memory: Bellek
+        network: Ağ G/Ç
+        pids: İşlemler
+    env:
+        variable: Değişken
+        value: Değer
+        click_to_reveal: Göstermek için tıklayın
+        empty: Ortam değişkeni bulunamadı.
+    network:
+        name: Ağ
+        ip: IP Adresi
+        gateway: Ağ Geçidi
+        mac: MAC Adresi
+        empty: Ağ bulunamadı.
+
+# Yığınlar
+stacks:
+    title: Compose Yığınları
+    subtitle: Çoklu konteyner dağıtımları için Docker Compose yığınlarını yönetin.
+    create_btn: Yığın Oluştur
+    services_count: "%running% / %total% servis çalışıyor"
+    status:
+        running: Çalışıyor
+        partial: Kısmi
+        stopped: Durduruldu
+        not_deployed: Dağıtılmadı
+    action:
+        deploy: Dağıt
+        down: Durdur
+        edit: Düzenle
+        delete: Sil
+    delete_confirm: Bu yığını silmek istediğinizden emin misiniz? Tüm konteynerler durdurulup kaldırılacaktır.
+    terminal:
+        deploying: "%name% dağıtılıyor..."
+        stopping: "%name% durduruluyor..."
+        deleting: "%name% siliniyor..."
+    empty:
+        title: Henüz yığın yok
+        description: Çoklu konteyner uygulamalarını dağıtmak için bir Docker Compose yığını oluşturun.
+    info:
+        services: Toplam Servis
+        running: Çalışan
+        status: Durum
+    services:
+        title: Servisler
+        th_name: Ad
+        th_image: İmaj
+        th_status: Durum
+        th_ports: Portlar
+    compose_file: Compose Dosyası
+    create:
+        title: Yığın Oluştur
+        subtitle: compose.yaml dosyasıyla yeni bir Docker Compose yığını tanımlayın.
+    edit:
+        title: "%name% Düzenle"
+        subtitle: Bu yığının compose.yaml dosyasını değiştirin.
+        breadcrumb: Düzenle
+    form:
+        name: Yığın Adı
+        name_placeholder: benim-yiginim
+        name_hint: Sadece küçük harf, rakam ve tire. Harf veya rakamla başlamalıdır.
+        compose_file: Compose Dosyası
+        compose_hint: Docker Compose sözdizimini kullanarak servislerinizi tanımlayın.
+        compose_template: |
+            services:
+              web:
+                image: nginx:alpine
+                ports:
+                  - "8080:80"
+        deploy_after: Oluşturduktan sonra dağıt
+        create_btn: Yığın Oluştur
+        save_btn: Değişiklikleri Kaydet
+        cancel: İptal
+    ports:
+        title: Port Eşlemeleri
+        subtitle: Her servis için host-konteyner port eşlemelerini yapılandırın.
+        add: Port Ekle
+        save: Portları Kaydet
+        save_success: Port eşlemeleri başarıyla kaydedildi.
+        no_ports: Yapılandırılmış port eşlemesi yok.
+        complex_port: Gelişmiş sözdizimi — compose dosya düzenleyicisinden düzenleyin.

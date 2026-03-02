@@ -1,0 +1,16 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    SfPanel\Ext\Containers\:
+        resource: '../src/'
+        exclude:
+            - '../src/Contracts/'
+            - '../src/Domain/Enum/'
+
+    SfPanel\Ext\Containers\Contracts\ContainerServiceInterface:
+        alias: SfPanel\Ext\Containers\Application\Service\ContainerService
+
+    SfPanel\Ext\Containers\Contracts\StackServiceInterface:
+        alias: SfPanel\Ext\Containers\Application\Service\StackService

@@ -1,0 +1,52 @@
+{# Updates the container list table body via Mercure Turbo Stream.
+   Note: csrf_token() requires an HTTP session which is unavailable in CLI worker context.
+   We stream status-only rows (no action forms). The full interactive table loads on page visit. #}
+<turbo-stream action="update" target="containers-table-body">
+    <template>
+        {% for container in containers %}
+            <tr class="hover:bg-muted/30 transition-colors">
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm font-medium text-gray-900">{{ container.name }}</span>
+                        {% if container.isSfPanel %}
+                            <span class="inline-flex items-center rounded-md bg-purple-50 px-1.5 py-0.5 text-[10px] font-medium text-purple-700 ring-1 ring-inset ring-purple-700/10">
+                                {{ 'containers.badge.system'|trans }}
+                            </span>
+                        {% endif %}
+                        {% if container.stackName %}
+                            <span class="text-xs text-muted-foreground">{{ container.stackName }}</span>
+                        {% endif %}
+                    </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <code class="text-xs text-gray-600">{{ container.image }}</code>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <twig:StatusBadge status="{{ container.statusColor }}">
+                        {{ container.status }}
+                    </twig:StatusBadge>
+                </td>
+                <td class="px-6 py-4 text-xs text-gray-600 max-w-48">
+                    <div class="flex flex-wrap gap-1">
+                        {% set published = container.ports|filter(p => p.hostPort > 0) %}
+                        {% for port in published|slice(0, 3) %}
+                            <span class="inline-block bg-gray-100 rounded px-1.5 py-0.5">{{ port.hostPort }}:{{ port.containerPort }}/{{ port.protocol }}</span>
+                        {% endfor %}
+                        {% if published|length > 3 %}
+                            <span class="inline-block text-muted-foreground px-1 py-0.5">+{{ published|length - 3 }}</span>
+                        {% endif %}
+                    </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-xs text-muted-foreground">
+                    {{ container.state|capitalize }}
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5" class="px-6 py-12 text-center text-muted-foreground">
+                    {{ 'containers.empty.title'|trans }}
+                </td>
+            </tr>
+        {% endfor %}
+    </template>
+</turbo-stream>

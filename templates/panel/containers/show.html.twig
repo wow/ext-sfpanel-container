@@ -1,0 +1,290 @@
+{% extends 'layouts/panel.html.twig' %}
+
+{% block title %}{{ container.name }} - {{ 'containers.title'|trans }}{% endblock %}
+
+{% block breadcrumbs %}
+    <a href="{{ path('panel_dashboard') }}" class="hover:text-gray-700">{{ 'nav.breadcrumb.panel'|trans }}</a>
+    <svg class="h-4 w-4 text-gray-400 mx-1" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+    <a href="{{ path('panel_containers') }}" class="hover:text-gray-700">{{ 'containers.title'|trans }}</a>
+    <svg class="h-4 w-4 text-gray-400 mx-1" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+    <span class="font-medium text-gray-900">{{ container.name }}</span>
+{% endblock %}
+
+{% block content %}
+    <div class="space-y-6">
+        {# Header #}
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <h1 class="text-2xl font-bold text-gray-900">{{ container.name }}</h1>
+                <twig:StatusBadge status="{{ container.statusColor }}">{{ container.status }}</twig:StatusBadge>
+                {% if container.isSfPanel %}
+                    <span class="inline-flex items-center rounded-md bg-purple-50 px-2 py-1 text-xs font-medium text-purple-700 ring-1 ring-inset ring-purple-700/10">
+                        {{ 'containers.badge.system'|trans }}
+                    </span>
+                {% endif %}
+            </div>
+            {% if not container.isSfPanel %}
+                <div class="flex items-center gap-2">
+                    {% if container.state != 'running' %}
+                        <form method="post" action="{{ path('panel_container_action', {id: container.id, action: 'start'}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('container_action_' ~ container.id) }}">
+                            <twig:Button type="submit" variant="success-soft" size="sm">{{ 'containers.action.start'|trans }}</twig:Button>
+                        </form>
+                    {% endif %}
+                    {% if container.state == 'running' %}
+                        <form method="post" action="{{ path('panel_container_action', {id: container.id, action: 'stop'}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('container_action_' ~ container.id) }}">
+                            <twig:Button type="submit" variant="danger-soft" size="sm">{{ 'containers.action.stop'|trans }}</twig:Button>
+                        </form>
+                    {% endif %}
+                    <form method="post" action="{{ path('panel_container_action', {id: container.id, action: 'restart'}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('container_action_' ~ container.id) }}">
+                        <twig:Button type="submit" variant="info-soft" size="sm">{{ 'containers.action.restart'|trans }}</twig:Button>
+                    </form>
+                    <form method="post" action="{{ path('panel_container_remove', {id: container.id}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('container_remove_' ~ container.id) }}">
+                        <input type="hidden" name="_method" value="DELETE">
+                        <twig:Button type="submit" variant="destructive" size="sm" onclick="return confirm('{{ 'containers.remove_confirm'|trans|e('js') }}')">{{ 'containers.action.remove'|trans }}</twig:Button>
+                    </form>
+                </div>
+            {% endif %}
+        </div>
+
+        {# Tabs #}
+        <div data-controller="tabs" data-tabs-active-value="info">
+            {# Tab headers #}
+            <div class="border-b border-gray-200">
+                <nav class="-mb-px flex gap-6" aria-label="Tabs">
+                    <button data-tabs-target="tab" data-tabs-id="info" data-action="tabs#select"
+                            class="border-b-2 px-1 pb-3 text-sm font-medium cursor-pointer" aria-selected="true">
+                        {{ 'containers.tab.info'|trans }}
+                    </button>
+                    <button data-tabs-target="tab" data-tabs-id="logs" data-action="tabs#select"
+                            class="border-b-2 px-1 pb-3 text-sm font-medium cursor-pointer">
+                        {{ 'containers.tab.logs'|trans }}
+                    </button>
+                    <button data-tabs-target="tab" data-tabs-id="stats" data-action="tabs#select"
+                            class="border-b-2 px-1 pb-3 text-sm font-medium cursor-pointer">
+                        {{ 'containers.tab.stats'|trans }}
+                    </button>
+                    <button data-tabs-target="tab" data-tabs-id="env" data-action="tabs#select"
+                            class="border-b-2 px-1 pb-3 text-sm font-medium cursor-pointer">
+                        {{ 'containers.tab.env'|trans }}
+                    </button>
+                    <button data-tabs-target="tab" data-tabs-id="networks" data-action="tabs#select"
+                            class="border-b-2 px-1 pb-3 text-sm font-medium cursor-pointer">
+                        {{ 'containers.tab.networks'|trans }}
+                    </button>
+                </nav>
+            </div>
+
+            {# Info tab #}
+            <div data-tabs-target="panel" data-tabs-id="info" class="mt-6">
+                <twig:Card>
+                    <div class="px-6">
+                        <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
+                            <div>
+                                <dt class="text-sm font-medium text-muted-foreground">{{ 'containers.detail.id'|trans }}</dt>
+                                <dd class="mt-1 text-sm font-mono text-gray-900">{{ container.id[:12] }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-muted-foreground">{{ 'containers.detail.image'|trans }}</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ container.image }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-muted-foreground">{{ 'containers.detail.command'|trans }}</dt>
+                                <dd class="mt-1 text-sm font-mono text-gray-900">{{ container.cmd ?: '-' }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-muted-foreground">{{ 'containers.detail.entrypoint'|trans }}</dt>
+                                <dd class="mt-1 text-sm font-mono text-gray-900">{{ container.entrypoint ?: '-' }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-muted-foreground">{{ 'containers.detail.restart_policy'|trans }}</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ container.restartPolicy }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-muted-foreground">{{ 'containers.detail.created'|trans }}</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ container.created }}</dd>
+                            </div>
+                            {% if container.startedAt %}
+                                <div>
+                                    <dt class="text-sm font-medium text-muted-foreground">{{ 'containers.detail.started_at'|trans }}</dt>
+                                    <dd class="mt-1 text-sm text-gray-900">{{ container.startedAt }}</dd>
+                                </div>
+                            {% endif %}
+                            {% if container.finishedAt and container.state != 'running' %}
+                                <div>
+                                    <dt class="text-sm font-medium text-muted-foreground">{{ 'containers.detail.finished_at'|trans }}</dt>
+                                    <dd class="mt-1 text-sm text-gray-900">{{ container.finishedAt }}</dd>
+                                </div>
+                            {% endif %}
+                        </dl>
+
+                        {% if container.ports %}
+                            <div class="mt-6 pt-6 border-t">
+                                <h3 class="text-sm font-medium text-gray-900 mb-3">{{ 'containers.detail.ports'|trans }}</h3>
+                                <div class="flex flex-wrap gap-2">
+                                    {% for port in container.ports %}
+                                        <span class="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-mono ring-1 ring-inset ring-gray-500/10">
+                                            {{ port.hostIp }}:{{ port.hostPort }} → {{ port.containerPort }}/{{ port.protocol }}
+                                        </span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if container.volumes %}
+                            <div class="mt-6 pt-6 border-t">
+                                <h3 class="text-sm font-medium text-gray-900 mb-3">{{ 'containers.detail.volumes'|trans }}</h3>
+                                <ul class="space-y-1">
+                                    {% for volume in container.volumes %}
+                                        <li class="text-xs font-mono text-gray-600">{{ volume }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+
+                        {% if container.labels %}
+                            <div class="mt-6 pt-6 border-t">
+                                <h3 class="text-sm font-medium text-gray-900 mb-3">{{ 'containers.detail.labels'|trans }}</h3>
+                                <dl class="space-y-1">
+                                    {% for key, value in container.labels %}
+                                        <div class="flex gap-2 text-xs">
+                                            <dt class="font-mono font-medium text-gray-700">{{ key }}</dt>
+                                            <dd class="font-mono text-gray-500">{{ value }}</dd>
+                                        </div>
+                                    {% endfor %}
+                                </dl>
+                            </div>
+                        {% endif %}
+                    </div>
+                </twig:Card>
+            </div>
+
+            {# Logs tab #}
+            <div data-tabs-target="panel" data-tabs-id="logs" class="hidden mt-6">
+                <twig:Card>
+                    <div class="px-6"
+                         data-controller="container-logs"
+                         data-container-logs-url-value="{{ path('panel_container_logs_stream', {id: container.id}) }}">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-sm font-medium text-gray-900">{{ 'containers.logs.title'|trans }}</h3>
+                            <label class="flex items-center gap-2 text-xs text-gray-500">
+                                <input type="checkbox" data-action="container-logs#toggleTimestamps"
+                                       class="form-checkbox rounded text-cyan-600 focus:ring-cyan-500">
+                                {{ 'containers.logs.timestamps'|trans }}
+                            </label>
+                        </div>
+                        <pre data-container-logs-target="output"
+                             class="bg-gray-950 text-gray-200 text-xs font-mono rounded-lg p-4 overflow-auto max-h-[500px] whitespace-pre-wrap">{{ 'containers.logs.loading'|trans }}</pre>
+                    </div>
+                </twig:Card>
+            </div>
+
+            {# Stats tab #}
+            <div data-tabs-target="panel" data-tabs-id="stats" class="hidden mt-6">
+                <div data-controller="container-stats"
+                     data-container-stats-url-value="{{ path('panel_container_stats_stream', {id: container.id}) }}">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <twig:Card>
+                            <div class="px-6">
+                                <p class="text-sm font-medium text-muted-foreground">{{ 'containers.stats.cpu'|trans }}</p>
+                                <p class="mt-1 text-2xl font-bold text-gray-900" data-container-stats-target="cpu">-</p>
+                                <twig:Progress value="0" data-container-stats-target="cpuBar" class="mt-2" />
+                            </div>
+                        </twig:Card>
+                        <twig:Card>
+                            <div class="px-6">
+                                <p class="text-sm font-medium text-muted-foreground">{{ 'containers.stats.memory'|trans }}</p>
+                                <p class="mt-1 text-2xl font-bold text-gray-900" data-container-stats-target="memory">-</p>
+                                <twig:Progress value="0" data-container-stats-target="memoryBar" class="mt-2" />
+                            </div>
+                        </twig:Card>
+                        <twig:Card>
+                            <div class="px-6">
+                                <p class="text-sm font-medium text-muted-foreground">{{ 'containers.stats.network'|trans }}</p>
+                                <p class="mt-1 text-sm text-gray-900">
+                                    <span class="text-green-600">↓</span> <span data-container-stats-target="netRx">-</span>
+                                    <span class="mx-1 text-gray-400">/</span>
+                                    <span class="text-blue-600">↑</span> <span data-container-stats-target="netTx">-</span>
+                                </p>
+                            </div>
+                        </twig:Card>
+                        <twig:Card>
+                            <div class="px-6">
+                                <p class="text-sm font-medium text-muted-foreground">{{ 'containers.stats.pids'|trans }}</p>
+                                <p class="mt-1 text-2xl font-bold text-gray-900" data-container-stats-target="pids">-</p>
+                            </div>
+                        </twig:Card>
+                    </div>
+                </div>
+            </div>
+
+            {# Environment tab #}
+            <div data-tabs-target="panel" data-tabs-id="env" class="hidden mt-6">
+                <twig:Card class="py-0 gap-0 overflow-hidden">
+                    {% if container.envVars %}
+                        <table class="min-w-full divide-y divide-border">
+                            <thead class="bg-muted/50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">{{ 'containers.env.variable'|trans }}</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">{{ 'containers.env.value'|trans }}</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-border">
+                                {% for envVar in container.envVars %}
+                                    {% set parts = envVar|split('=', 2) %}
+                                    <tr>
+                                        <td class="px-6 py-3 whitespace-nowrap text-sm font-mono font-medium text-gray-900">{{ parts[0] }}</td>
+                                        <td class="px-6 py-3 text-sm font-mono text-gray-600">
+                                            <span class="env-value-masked cursor-pointer hover:text-gray-900" title="{{ 'containers.env.click_to_reveal'|trans }}"
+                                                  onclick="this.textContent = this.dataset.value; this.classList.remove('env-value-masked')"
+                                                  data-value="{{ parts[1]|default('')|e('html_attr') }}">••••••••</span>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <div class="px-6 py-8 text-center text-sm text-muted-foreground">
+                            {{ 'containers.env.empty'|trans }}
+                        </div>
+                    {% endif %}
+                </twig:Card>
+            </div>
+
+            {# Networks tab #}
+            <div data-tabs-target="panel" data-tabs-id="networks" class="hidden mt-6">
+                <twig:Card class="py-0 gap-0 overflow-hidden">
+                    {% if container.networks %}
+                        <table class="min-w-full divide-y divide-border">
+                            <thead class="bg-muted/50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">{{ 'containers.network.name'|trans }}</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">{{ 'containers.network.ip'|trans }}</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">{{ 'containers.network.gateway'|trans }}</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">{{ 'containers.network.mac'|trans }}</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-border">
+                                {% for network in container.networks %}
+                                    <tr>
+                                        <td class="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{{ network.name }}</td>
+                                        <td class="px-6 py-3 whitespace-nowrap text-sm font-mono text-gray-600">{{ network.ipAddress }}</td>
+                                        <td class="px-6 py-3 whitespace-nowrap text-sm font-mono text-gray-600">{{ network.gateway }}</td>
+                                        <td class="px-6 py-3 whitespace-nowrap text-sm font-mono text-gray-600">{{ network.macAddress }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <div class="px-6 py-8 text-center text-sm text-muted-foreground">
+                            {{ 'containers.network.empty'|trans }}
+                        </div>
+                    {% endif %}
+                </twig:Card>
+            </div>
+        </div>
+    </div>
+{% endblock %}

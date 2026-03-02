@@ -1,0 +1,112 @@
+{% extends 'layouts/panel.html.twig' %}
+
+{% block title %}{{ 'stacks.title'|trans }}{% endblock %}
+
+{% block breadcrumbs %}
+    <a href="{{ path('panel_dashboard') }}" class="hover:text-gray-700">{{ 'nav.breadcrumb.panel'|trans }}</a>
+    <svg class="h-4 w-4 text-gray-400 mx-1" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+    <a href="{{ path('panel_containers') }}" class="hover:text-gray-700">{{ 'containers.title'|trans }}</a>
+    <svg class="h-4 w-4 text-gray-400 mx-1" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+    <span class="font-medium text-gray-900">{{ 'stacks.title'|trans }}</span>
+{% endblock %}
+
+{% block content %}
+    <div class="space-y-6">
+        {# Header #}
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">{{ 'stacks.title'|trans }}</h1>
+                <p class="mt-1 text-sm text-muted-foreground">{{ 'stacks.subtitle'|trans }}</p>
+            </div>
+            <twig:Button as="a" href="{{ path('panel_container_stacks_new') }}">
+                <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                </svg>
+                {{ 'stacks.create_btn'|trans }}
+            </twig:Button>
+        </div>
+
+        {# Tab navigation #}
+        <div class="border-b border-gray-200">
+            <nav class="-mb-px flex gap-6" aria-label="Tabs">
+                <a href="{{ path('panel_containers') }}"
+                   class="border-b-2 border-transparent px-1 pb-3 text-sm font-medium text-muted-foreground hover:border-gray-300 hover:text-gray-700">
+                    {{ 'containers.tab.containers'|trans }}
+                </a>
+                <a href="{{ path('panel_container_stacks') }}"
+                   class="border-b-2 border-primary px-1 pb-3 text-sm font-medium text-primary">
+                    {{ 'containers.tab.stacks'|trans }}
+                </a>
+            </nav>
+        </div>
+
+        {# Stack cards #}
+        {% if stacks %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {% for stack in stacks %}
+                    <twig:Card>
+                        <div class="px-6">
+                            <div class="flex items-center justify-between mb-3">
+                                <a href="{{ path('panel_container_stacks_show', {name: stack.name}) }}"
+                                   class="text-base font-semibold text-gray-900 hover:text-primary">
+                                    {{ stack.name }}
+                                </a>
+                                <twig:StatusBadge status="{{ stack.statusColor }}">{{ ('stacks.status.' ~ stack.status)|trans }}</twig:StatusBadge>
+                            </div>
+
+                            <div class="text-sm text-muted-foreground mb-4">
+                                {{ 'stacks.services_count'|trans({'%running%': stack.runningCount, '%total%': stack.serviceCount}) }}
+                            </div>
+
+                            <div class="flex items-center gap-2 pt-3 border-t">
+                                {% if not stack.isDeployed %}
+                                    <form method="post" action="{{ path('panel_container_stacks_deploy', {name: stack.name}) }}"
+                                          data-controller="process-dialog"
+                                          data-process-dialog-title-value="{{ 'stacks.terminal.deploying'|trans({'%name%': stack.name}) }}"
+                                          data-process-dialog-redirect-url-value="{{ path('panel_container_stacks') }}"
+                                          data-action="submit->process-dialog#submit">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('stack_deploy_' ~ stack.name) }}">
+                                        <twig:Button type="submit" variant="success-soft" size="xs">{{ 'stacks.action.deploy'|trans }}</twig:Button>
+                                    </form>
+                                {% else %}
+                                    <form method="post" action="{{ path('panel_container_stacks_down', {name: stack.name}) }}"
+                                          data-controller="process-dialog"
+                                          data-process-dialog-title-value="{{ 'stacks.terminal.stopping'|trans({'%name%': stack.name}) }}"
+                                          data-process-dialog-redirect-url-value="{{ path('panel_container_stacks') }}"
+                                          data-action="submit->process-dialog#submit">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('stack_down_' ~ stack.name) }}">
+                                        <twig:Button type="submit" variant="danger-soft" size="xs">{{ 'stacks.action.down'|trans }}</twig:Button>
+                                    </form>
+                                {% endif %}
+                                <twig:Button as="a" href="{{ path('panel_container_stacks_edit', {name: stack.name}) }}" variant="outline" size="xs">
+                                    {{ 'stacks.action.edit'|trans }}
+                                </twig:Button>
+                                <form method="post" action="{{ path('panel_container_stacks_delete', {name: stack.name}) }}" class="ml-auto"
+                                      data-controller="process-dialog"
+                                      data-process-dialog-title-value="{{ 'stacks.terminal.deleting'|trans({'%name%': stack.name}) }}"
+                                      data-process-dialog-redirect-url-value="{{ path('panel_container_stacks') }}"
+                                      data-action="submit->process-dialog#submit">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('stack_delete_' ~ stack.name) }}">
+                                    <input type="hidden" name="_method" value="DELETE">
+                                    <twig:Button type="submit" variant="outline" size="xs" class="text-red-600 hover:text-red-700">
+                                        {{ 'stacks.action.delete'|trans }}
+                                    </twig:Button>
+                                </form>
+                            </div>
+                        </div>
+                    </twig:Card>
+                {% endfor %}
+            </div>
+        {% else %}
+            <twig:Card>
+                <twig:EmptyState
+                    title="{{ 'stacks.empty.title'|trans }}"
+                    description="{{ 'stacks.empty.description'|trans }}"
+                    icon="M6.429 9.75L2.25 12l4.179 2.25m0-4.5l5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L21.75 12l-4.179 2.25m0 0l4.179 2.25L12 21.75 2.25 16.5l4.179-2.25m11.142 0l-5.571 3-5.571-3"
+                    actionUrl="{{ path('panel_container_stacks_new') }}"
+                    actionLabel="{{ 'stacks.create_btn'|trans }}"
+                />
+            </twig:Card>
+        {% endif %}
+    </div>
+{% endblock %}
