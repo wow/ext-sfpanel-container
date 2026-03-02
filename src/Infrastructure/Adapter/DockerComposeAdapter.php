@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SfPanel\Ext\Containers\Infrastructure\Adapter;
+namespace Wow\Ext\Containers\Infrastructure\Adapter;
 
 use App\Shared\Attribute\AI\Describe;
 use App\Shared\Infrastructure\Command\CommandExecutorInterface;

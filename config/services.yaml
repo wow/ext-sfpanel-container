@@ -3,14 +3,14 @@ services:
         autowire: true
         autoconfigure: true
 
-    SfPanel\Ext\Containers\:
+    Wow\Ext\Containers\:
         resource: '../src/'
         exclude:
             - '../src/Contracts/'
             - '../src/Domain/Enum/'
 
-    SfPanel\Ext\Containers\Contracts\ContainerServiceInterface:
-        alias: SfPanel\Ext\Containers\Application\Service\ContainerService
+    Wow\Ext\Containers\Contracts\ContainerServiceInterface:
+        alias: Wow\Ext\Containers\Application\Service\ContainerService
 
-    SfPanel\Ext\Containers\Contracts\StackServiceInterface:
-        alias: SfPanel\Ext\Containers\Application\Service\StackService
+    Wow\Ext\Containers\Contracts\StackServiceInterface:
+        alias: Wow\Ext\Containers\Application\Service\StackService

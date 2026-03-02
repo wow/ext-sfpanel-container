@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SfPanel\Ext\Containers;
+namespace Wow\Ext\Containers;
 
 use App\Shared\Extension\AbstractExtension;
 

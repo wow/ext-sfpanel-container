@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace SfPanel\Ext\Containers\Tests\Unit\Application\Service;
+namespace Wow\Ext\Containers\Tests\Unit\Application\Service;
 
-use SfPanel\Ext\Containers\Application\Service\StackService;
-use SfPanel\Ext\Containers\Infrastructure\Adapter\DockerComposeAdapter;
+use Wow\Ext\Containers\Application\Service\StackService;
+use Wow\Ext\Containers\Infrastructure\Adapter\DockerComposeAdapter;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;

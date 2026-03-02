@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace SfPanel\Ext\Containers\Controller;
+namespace Wow\Ext\Containers\Controller;
 
-use SfPanel\Ext\Containers\Contracts\ContainerServiceInterface;
-use SfPanel\Ext\Containers\Contracts\StackServiceInterface;
+use Wow\Ext\Containers\Contracts\ContainerServiceInterface;
+use Wow\Ext\Containers\Contracts\StackServiceInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;

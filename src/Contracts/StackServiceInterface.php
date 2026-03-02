@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace SfPanel\Ext\Containers\Contracts;
+namespace Wow\Ext\Containers\Contracts;
 
-use SfPanel\Ext\Containers\Contracts\Dto\StackDto;
+use Wow\Ext\Containers\Contracts\Dto\StackDto;
 
 interface StackServiceInterface
 {

@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace SfPanel\Ext\Containers\Application\Service;
+namespace Wow\Ext\Containers\Application\Service;
 
-use SfPanel\Ext\Containers\Contracts\ContainerServiceInterface;
-use SfPanel\Ext\Containers\Contracts\Dto\ContainerDetailDto;
-use SfPanel\Ext\Containers\Contracts\Dto\ContainerDto;
-use SfPanel\Ext\Containers\Contracts\Dto\ContainerNetworkDto;
-use SfPanel\Ext\Containers\Contracts\Dto\ContainerPortDto;
-use SfPanel\Ext\Containers\Contracts\Dto\ContainerStatsDto;
-use SfPanel\Ext\Containers\Contracts\Event\ContainerActionEvent;
-use SfPanel\Ext\Containers\Domain\Enum\ContainerStatus;
-use SfPanel\Ext\Containers\Infrastructure\Adapter\DockerCliAdapter;
+use Wow\Ext\Containers\Contracts\ContainerServiceInterface;
+use Wow\Ext\Containers\Contracts\Dto\ContainerDetailDto;
+use Wow\Ext\Containers\Contracts\Dto\ContainerDto;
+use Wow\Ext\Containers\Contracts\Dto\ContainerNetworkDto;
+use Wow\Ext\Containers\Contracts\Dto\ContainerPortDto;
+use Wow\Ext\Containers\Contracts\Dto\ContainerStatsDto;
+use Wow\Ext\Containers\Contracts\Event\ContainerActionEvent;
+use Wow\Ext\Containers\Domain\Enum\ContainerStatus;
+use Wow\Ext\Containers\Infrastructure\Adapter\DockerCliAdapter;
 use App\Shared\Attribute\AI\Describe;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;

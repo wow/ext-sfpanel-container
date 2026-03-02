@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace SfPanel\Ext\Containers\Contracts;
+namespace Wow\Ext\Containers\Contracts;
 
-use SfPanel\Ext\Containers\Contracts\Dto\ContainerDetailDto;
-use SfPanel\Ext\Containers\Contracts\Dto\ContainerDto;
-use SfPanel\Ext\Containers\Contracts\Dto\ContainerStatsDto;
+use Wow\Ext\Containers\Contracts\Dto\ContainerDetailDto;
+use Wow\Ext\Containers\Contracts\Dto\ContainerDto;
+use Wow\Ext\Containers\Contracts\Dto\ContainerStatsDto;
 
 interface ContainerServiceInterface
 {

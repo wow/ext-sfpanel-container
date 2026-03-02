@@ -4,7 +4,7 @@ extension:
     description: Docker container management and Compose stack deployment for sfPanel.
     version: 1.0.0
     license: MIT
-    namespace: SfPanel\Ext\Containers
+    namespace: Wow\Ext\Containers
 
     author:
         name: sfPanel
@@ -22,8 +22,8 @@ extension:
             commands: [docker]
         hooks:
             events_emit:
-                - SfPanel\Ext\Containers\Contracts\Event\ContainerActionEvent
-                - SfPanel\Ext\Containers\Contracts\Event\StackDeployedEvent
+                - Wow\Ext\Containers\Contracts\Event\ContainerActionEvent
+                - Wow\Ext\Containers\Contracts\Event\StackDeployedEvent
 
     capabilities:
         routes: true

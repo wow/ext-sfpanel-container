@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace SfPanel\Ext\Containers\Application\Service;
+namespace Wow\Ext\Containers\Application\Service;
 
-use SfPanel\Ext\Containers\Contracts\Dto\StackDto;
-use SfPanel\Ext\Containers\Contracts\Event\StackDeployedEvent;
-use SfPanel\Ext\Containers\Contracts\StackServiceInterface;
-use SfPanel\Ext\Containers\Domain\Enum\StackStatus;
-use SfPanel\Ext\Containers\Infrastructure\Adapter\DockerComposeAdapter;
+use Wow\Ext\Containers\Contracts\Dto\StackDto;
+use Wow\Ext\Containers\Contracts\Event\StackDeployedEvent;
+use Wow\Ext\Containers\Contracts\StackServiceInterface;
+use Wow\Ext\Containers\Domain\Enum\StackStatus;
+use Wow\Ext\Containers\Infrastructure\Adapter\DockerComposeAdapter;
 use App\Shared\Attribute\AI\Describe;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;

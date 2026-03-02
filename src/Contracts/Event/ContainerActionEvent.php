@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SfPanel\Ext\Containers\Contracts\Event;
+namespace Wow\Ext\Containers\Contracts\Event;
 
 final readonly class ContainerActionEvent
 {

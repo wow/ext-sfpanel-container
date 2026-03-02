@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SfPanel\Ext\Containers\Application\Service;
+namespace Wow\Ext\Containers\Application\Service;
 
 use App\Shared\Extension\Menu\MenuItem;
 use App\Shared\Extension\Menu\MenuItemProviderInterface;

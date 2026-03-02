@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace SfPanel\Ext\Containers\Application\Handler;
+namespace Wow\Ext\Containers\Application\Handler;
 
-use SfPanel\Ext\Containers\Application\Message\PublishContainerListMessage;
-use SfPanel\Ext\Containers\Contracts\ContainerServiceInterface;
+use Wow\Ext\Containers\Application\Message\PublishContainerListMessage;
+use Wow\Ext\Containers\Contracts\ContainerServiceInterface;
 use App\Shared\Attribute\AI\Describe;
 use App\Shared\Infrastructure\Mercure\MercurePublisher;
-use SfPanel\Ext\Containers\ContainerTopics;
+use Wow\Ext\Containers\ContainerTopics;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Twig\Environment;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SfPanel\Ext\Containers\Domain\Enum;
+namespace Wow\Ext\Containers\Domain\Enum;
 
 enum StackStatus: string
 {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SfPanel\Ext\Containers\Contracts\Dto;
+namespace Wow\Ext\Containers\Contracts\Dto;
 
 final readonly class ContainerNetworkDto
 {

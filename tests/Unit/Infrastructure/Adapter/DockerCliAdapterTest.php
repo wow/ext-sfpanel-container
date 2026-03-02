@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace SfPanel\Ext\Containers\Tests\Unit\Infrastructure\Adapter;
+namespace Wow\Ext\Containers\Tests\Unit\Infrastructure\Adapter;
 
-use SfPanel\Ext\Containers\Infrastructure\Adapter\DockerCliAdapter;
+use Wow\Ext\Containers\Infrastructure\Adapter\DockerCliAdapter;
 use App\Shared\Infrastructure\Command\CommandExecutorInterface;
 use App\Shared\Infrastructure\Command\CommandResult;
 use PHPUnit\Framework\MockObject\MockObject;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SfPanel\Ext\Containers\Tests\Functional\Controller;
+namespace Wow\Ext\Containers\Tests\Functional\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
