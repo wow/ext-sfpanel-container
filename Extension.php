@@ -10,7 +10,7 @@ class Extension extends AbstractExtension
 {
     public function install(): void
     {
-        // The mnt/containers/ directory is managed by StackService at runtime
+        // The mnt/ext/wow/ext-sfpanel-container/stacks/ directory is managed by StackService at runtime
     }
 
     public function activate(): void
@@ -25,7 +25,7 @@ class Extension extends AbstractExtension
 
     public function uninstall(bool $keepData): void
     {
-        // Stack data lives in mnt/containers/ which is a bind-mounted host directory.
+        // Stack data lives in mnt/ext/wow/ext-sfpanel-container/stacks/ which is a bind-mounted host directory.
         // Cleaning it up would require the StackService to stop all stacks first.
         // For safety, we leave stack data intact on uninstall.
     }

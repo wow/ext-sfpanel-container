@@ -1,5 +1,5 @@
 extension:
-    name: sfpanel/containers
+    name: wow/ext-sfpanel-container
     label: Containers
     description: Docker container management and Compose stack deployment for sfPanel.
     version: 1.0.0
@@ -17,7 +17,7 @@ extension:
     permissions:
         filesystem:
             read: [/var/run/docker.sock]
-            write: [mnt/containers/]
+            write: [/stacks]
         system:
             commands: [docker]
         hooks:

@@ -32,7 +32,7 @@ final readonly class StackService implements StackServiceInterface
 
     public function list(): array
     {
-        $containersDir = $this->projectDir.'/mnt/containers';
+        $containersDir = $this->getStacksBaseDir();
 
         if (!is_dir($containersDir)) {
             return [];
@@ -231,9 +231,14 @@ final readonly class StackService implements StackServiceInterface
         }
     }
 
+    private function getStacksBaseDir(): string
+    {
+        return $this->projectDir.'/mnt/ext/wow/ext-sfpanel-container/stacks';
+    }
+
     private function getStackDir(string $name): string
     {
-        return $this->projectDir.'/mnt/containers/'.$name;
+        return $this->getStacksBaseDir().'/'.$name;
     }
 
     private function getProjectName(string $name): string

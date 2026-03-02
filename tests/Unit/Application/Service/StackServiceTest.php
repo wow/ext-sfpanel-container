@@ -28,7 +28,7 @@ final class StackServiceTest extends TestCase
         );
 
         $this->tempDir = sys_get_temp_dir().'/sfpanel-test-'.bin2hex(random_bytes(4));
-        mkdir($this->tempDir.'/mnt/containers', 0o755, true);
+        mkdir($this->tempDir.'/mnt/ext/wow/ext-sfpanel-container/stacks', 0o755, true);
 
         $this->service = new StackService(
             $this->composeAdapter,
@@ -86,7 +86,7 @@ final class StackServiceTest extends TestCase
 
     public function testCreateRejectsDuplicate(): void
     {
-        $stackDir = $this->tempDir.'/mnt/containers/existing';
+        $stackDir = $this->tempDir.'/mnt/ext/wow/ext-sfpanel-container/stacks/existing';
         mkdir($stackDir, 0o755, true);
         file_put_contents($stackDir.'/compose.yaml', "services:\n  web:\n    image: nginx");
 
@@ -104,8 +104,8 @@ final class StackServiceTest extends TestCase
         $result = $this->service->create('my-stack', $content);
 
         self::assertSame('my-stack', $result->name);
-        self::assertTrue(file_exists($this->tempDir.'/mnt/containers/my-stack/compose.yaml'));
-        self::assertSame($content, file_get_contents($this->tempDir.'/mnt/containers/my-stack/compose.yaml'));
+        self::assertTrue(file_exists($this->tempDir.'/mnt/ext/wow/ext-sfpanel-container/stacks/my-stack/compose.yaml'));
+        self::assertSame($content, file_get_contents($this->tempDir.'/mnt/ext/wow/ext-sfpanel-container/stacks/my-stack/compose.yaml'));
     }
 
     public function testGetThrowsForNonexistent(): void
@@ -118,7 +118,7 @@ final class StackServiceTest extends TestCase
 
     public function testGetReturnsDtoFromFilesystem(): void
     {
-        $stackDir = $this->tempDir.'/mnt/containers/my-stack';
+        $stackDir = $this->tempDir.'/mnt/ext/wow/ext-sfpanel-container/stacks/my-stack';
         mkdir($stackDir, 0o755, true);
         file_put_contents($stackDir.'/compose.yaml', "services:\n  web:\n    image: nginx");
 
@@ -137,7 +137,7 @@ final class StackServiceTest extends TestCase
         $this->composeAdapter->method('ps')->willReturn([]);
 
         foreach (['alpha', 'bravo', 'charlie'] as $name) {
-            $dir = $this->tempDir.'/mnt/containers/'.$name;
+            $dir = $this->tempDir.'/mnt/ext/wow/ext-sfpanel-container/stacks/'.$name;
             mkdir($dir, 0o755, true);
             file_put_contents($dir.'/compose.yaml', "services:\n  web:\n    image: nginx");
         }
@@ -152,7 +152,7 @@ final class StackServiceTest extends TestCase
 
     public function testDeployCallsComposeUp(): void
     {
-        $stackDir = $this->tempDir.'/mnt/containers/my-stack';
+        $stackDir = $this->tempDir.'/mnt/ext/wow/ext-sfpanel-container/stacks/my-stack';
         mkdir($stackDir, 0o755, true);
         file_put_contents($stackDir.'/compose.yaml', "services:\n  web:\n    image: nginx");
 
@@ -170,7 +170,7 @@ final class StackServiceTest extends TestCase
 
     public function testDownCallsComposeDown(): void
     {
-        $stackDir = $this->tempDir.'/mnt/containers/my-stack';
+        $stackDir = $this->tempDir.'/mnt/ext/wow/ext-sfpanel-container/stacks/my-stack';
         mkdir($stackDir, 0o755, true);
         file_put_contents($stackDir.'/compose.yaml', "services:\n  web:\n    image: nginx");
 
@@ -186,7 +186,7 @@ final class StackServiceTest extends TestCase
 
     public function testDeleteRemovesDirectory(): void
     {
-        $stackDir = $this->tempDir.'/mnt/containers/my-stack';
+        $stackDir = $this->tempDir.'/mnt/ext/wow/ext-sfpanel-container/stacks/my-stack';
         mkdir($stackDir, 0o755, true);
         file_put_contents($stackDir.'/compose.yaml', "services:\n  web:\n    image: nginx");
 
@@ -202,7 +202,7 @@ final class StackServiceTest extends TestCase
 
     public function testGetComposeFileContentReturnsContent(): void
     {
-        $stackDir = $this->tempDir.'/mnt/containers/my-stack';
+        $stackDir = $this->tempDir.'/mnt/ext/wow/ext-sfpanel-container/stacks/my-stack';
         mkdir($stackDir, 0o755, true);
         file_put_contents($stackDir.'/compose.yaml', "services:\n  web:\n    image: nginx");
 
