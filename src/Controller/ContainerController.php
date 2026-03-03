@@ -415,6 +415,11 @@ final class ContainerController extends AbstractController
         $timestamps = $request->query->getBoolean('timestamps');
         $interval = max(2, min($request->query->getInt('interval', 3), 30));
 
+        // Release session lock before streaming to avoid blocking other requests
+        if (\PHP_SESSION_ACTIVE === session_status()) {
+            session_write_close();
+        }
+
         set_time_limit(0);
 
         return new StreamedResponse(function () use ($id, $tail, $timestamps, $interval, $containerService): void {
@@ -470,6 +475,11 @@ final class ContainerController extends AbstractController
     public function statsStream(string $id, Request $request, ContainerServiceInterface $containerService): StreamedResponse
     {
         $interval = max(2, min($request->query->getInt('interval', 3), 30));
+
+        // Release session lock before streaming to avoid blocking other requests
+        if (\PHP_SESSION_ACTIVE === session_status()) {
+            session_write_close();
+        }
 
         set_time_limit(0);
 
