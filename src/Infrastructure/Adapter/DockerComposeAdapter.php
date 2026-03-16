@@ -6,6 +6,7 @@ namespace Wow\Ext\Containers\Infrastructure\Adapter;
 
 use App\Shared\Attribute\AI\Describe;
 use App\Shared\Infrastructure\Command\CommandExecutorInterface;
+use App\Shared\Infrastructure\Docker\HostPathResolver;
 use Psr\Log\LoggerInterface;
 
 #[Describe('Wraps Docker Compose CLI commands for stack management', module: 'Container', layer: 'Infrastructure')]
@@ -14,6 +15,7 @@ final readonly class DockerComposeAdapter
     public function __construct(
         private CommandExecutorInterface $commandExecutor,
         private LoggerInterface $logger,
+        private HostPathResolver $hostPathResolver,
     ) {
     }
 
@@ -21,10 +23,9 @@ final readonly class DockerComposeAdapter
     {
         $this->validateComposeFileExists($stackDir);
 
-        $result = $this->commandExecutor->execute(
-            ['docker', 'compose', '-f', $stackDir.'/compose.yaml', '-p', $projectName, 'up', '-d'],
-            timeout: 120,
-        );
+        $command = [...$this->buildComposeCommand($stackDir, $projectName), 'up', '-d'];
+
+        $result = $this->commandExecutor->execute($command, cwd: $stackDir, timeout: 120);
 
         if (!$result->isSuccessful()) {
             $this->logger->error('Failed to deploy stack', [
@@ -45,12 +46,12 @@ final readonly class DockerComposeAdapter
     {
         $this->validateComposeFileExists($stackDir);
 
-        $command = ['docker', 'compose', '-f', $stackDir.'/compose.yaml', '-p', $projectName, 'down'];
+        $command = [...$this->buildComposeCommand($stackDir, $projectName), 'down'];
         if ($removeVolumes) {
             $command[] = '-v';
         }
 
-        $result = $this->commandExecutor->execute($command, timeout: 120);
+        $result = $this->commandExecutor->execute($command, cwd: $stackDir, timeout: 120);
 
         if (!$result->isSuccessful()) {
             $this->logger->error('Failed to stop stack', [
@@ -78,9 +79,9 @@ final readonly class DockerComposeAdapter
     {
         $this->validateComposeFileExists($stackDir);
 
-        $result = $this->commandExecutor->execute(
-            ['docker', 'compose', '-f', $stackDir.'/compose.yaml', '-p', $projectName, 'ps', '--format', 'json'],
-        );
+        $command = [...$this->buildComposeCommand($stackDir, $projectName), 'ps', '--format', 'json'];
+
+        $result = $this->commandExecutor->execute($command, cwd: $stackDir);
 
         if (!$result->isSuccessful()) {
             $this->logger->error('Failed to list stack containers', [
@@ -120,10 +121,9 @@ final readonly class DockerComposeAdapter
     {
         $this->validateComposeFileExists($stackDir);
 
-        $result = $this->commandExecutor->execute(
-            ['docker', 'compose', '-f', $stackDir.'/compose.yaml', '-p', $projectName, 'pull'],
-            timeout: 120,
-        );
+        $command = [...$this->buildComposeCommand($stackDir, $projectName), 'pull'];
+
+        $result = $this->commandExecutor->execute($command, cwd: $stackDir, timeout: 120);
 
         if (!$result->isSuccessful()) {
             $this->logger->error('Failed to pull stack images', [
@@ -142,9 +142,9 @@ final readonly class DockerComposeAdapter
     {
         $this->validateComposeFileExists($stackDir);
 
-        $result = $this->commandExecutor->execute(
-            ['docker', 'compose', '-f', $stackDir.'/compose.yaml', '-p', $projectName, 'logs', '--tail', (string)$tail],
-        );
+        $command = [...$this->buildComposeCommand($stackDir, $projectName), 'logs', '--tail', (string)$tail];
+
+        $result = $this->commandExecutor->execute($command, cwd: $stackDir);
 
         if (!$result->isSuccessful()) {
             $this->logger->error('Failed to get stack logs', [
@@ -157,6 +157,20 @@ final readonly class DockerComposeAdapter
         }
 
         return $result->output.$result->errorOutput;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function buildComposeCommand(string $stackDir, string $projectName): array
+    {
+        // --project-directory must be a HOST path: the Docker daemon resolves
+        // relative bind mounts (./file) against it, and the daemon runs on the host.
+        // -f must be a CONTAINER path: the docker compose CLI reads the file
+        // locally inside the container before sending the config to the daemon.
+        $hostDir = $this->hostPathResolver->toHostPath($stackDir);
+
+        return ['docker', 'compose', '--project-directory', $hostDir, '-f', $stackDir.'/compose.yaml', '-p', $projectName];
     }
 
     private function validateComposeFileExists(string $stackDir): void
